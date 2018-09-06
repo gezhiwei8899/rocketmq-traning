@@ -1,0 +1,23 @@
+# Global
+target
+*.log
+
+# Eclipse
+.project
+.classpath
+.settings
+.metadata
+
+# IntelliJ
+.idea
+*.iml
+
+# Svn
+.svn
+
+# Maven
+release.properties
+*.releaseBackup
+
+# Mac
+.DS_Store
