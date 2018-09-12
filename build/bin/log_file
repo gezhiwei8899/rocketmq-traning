@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+BIN_PATH=$(cd "$(dirname "$0")"; pwd)
+LOG_DIR="$BIN_PATH/../log"
+# print usage
+function print_usage(){
+    echo "Usage: log_file {line} {date: yyyy-MM-dd}"
+}
+if [ $# -lt 2 ]; then
+    print_usage
+    exit
+fi
+#
+LINE=$1
+shift
+DATE=$1
+
+#
+LOG_FILE="$LOG_DIR/$DATE.log"
+if [ ! -f "$LOG_FILE" ]; then
+    echo "Log file not exists: $LOG_FILE"
+    exit
+fi
+tail -$LINE $LOG_FILE

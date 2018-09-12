@@ -8,8 +8,6 @@ import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
 /**
  * @ClassName: ConsumerDataServiceImpl
  * @Author: 葛志伟(赛事)

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <!-- console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] - %msg%n</Pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+    <!-- file -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <prudent>true</prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>log/%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger[%L,%F] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- ASYNC_CONSOLE -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="CONSOLE"/>
+    </appender>
+    <!-- ASYNC_FILE -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </root>
+
+    <!--org-->
+    <logger name="org" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    <logger name="org" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </logger>
+    <!--mongodb-->
+    <logger name="com.mongodb" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    <logger name="com.mongodb" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </logger>
+    <!--redis-->
+    <logger name="redis" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    <logger name="redis" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </logger>
+    <!--c3p0-->
+    <logger name="com.mchange" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+    <logger name="com.mchange" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </logger>
+    <logger name="com.jdddata.bas.sportdata.mybatis" level="DEBUG"/>
+</configuration>

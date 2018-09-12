@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+BIN_PATH=$(cd "$(dirname "$0")"; pwd)
+OUT_FILE="$BIN_PATH/../crawler.out"
+# print usage
+function print_usage(){
+    echo "Usage: log_console {line}"
+}
+if [ $# -lt 1 ]; then
+    print_usage
+    exit
+fi
+LINE=$1
+tail -$LINE $OUT_FILE

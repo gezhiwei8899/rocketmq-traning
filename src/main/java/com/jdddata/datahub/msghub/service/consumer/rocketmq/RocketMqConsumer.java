@@ -8,7 +8,6 @@ import com.jdddata.datahub.msghub.common.TopicMgr;
 import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
 import com.jdddata.datahub.msghub.service.consumer.cache.MessageCache;
-import com.jdddata.datahub.msghub.service.producer.ProducerDataHandlerImpl;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.client.exception.MQClientException;

@@ -27,7 +27,7 @@ public class ConsumerBase implements ConsumerServiceApi {
 
     private static final Map<String, IConsumer> STRING_ROCKET_CONSUMER_TASK_MAP = new ConcurrentHashMap<>();
 
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(10, r -> new Thread(r, "pullMessageFromMQ"));
 
     static {
         Metrics.defaultRegistry().register(MetricRegistry.name(ConsumerBase.class, "ConsumerBase IConsumer", "size"), (Gauge<Long>) () -> (long) STRING_ROCKET_CONSUMER_TASK_MAP.size());
