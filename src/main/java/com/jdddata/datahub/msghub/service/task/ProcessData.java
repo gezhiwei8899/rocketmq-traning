@@ -1,7 +1,8 @@
-package com.jdddata.datahub.msghub.message;
+package com.jdddata.datahub.msghub.service.task;
 
-import com.jdddata.datahub.common.service.Message;
-import com.jdddata.datahub.msghub.producer.ProducerBase;
+import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.msghub.service.api.ProducerDataHandler;
+import com.jdddata.datahub.msghub.service.api.ProducerServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,12 +15,15 @@ import org.springframework.stereotype.Component;
  * @modified By:
  */
 @Component
-public class ProcessData implements CommandLineRunner, BaseEumu {
+public class ProcessData implements CommandLineRunner {
 
     private volatile boolean running = true;
 
     @Autowired
-    private IReceive iReceive;
+    private ProducerDataHandler producerDataHandler;
+
+    @Autowired
+    private ProducerServiceApi producerServiceApi;
 
 
     @Override
@@ -27,9 +31,9 @@ public class ProcessData implements CommandLineRunner, BaseEumu {
         Thread t = new Thread(() -> {
             try {
                 while (running) {
-                    Message message = iReceive.take();
+                    Message message = producerDataHandler.take();
                     if (null != message) {
-                        boolean send = ProducerBase.INSTANCE.send(message.getNamespace(), message.getSchema(), message);
+                        boolean send = producerServiceApi.send(message.getNamespace(), message.getSchema(), message);
                         if (!send) {
 
                         }
@@ -38,7 +42,7 @@ public class ProcessData implements CommandLineRunner, BaseEumu {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                ProducerBase.close();
+                producerServiceApi.close();
             }
         });
         t.start();

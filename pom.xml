@@ -14,7 +14,24 @@
         <artifactId>datahub-msghub-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-
+    <!--仓库-->
+    <repositories>
+        <repository>
+            <id>jdddata</id>
+            <url>http://maven-repository.jdddata.com/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+    <!--发布仓库-->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>jddsjSnapshots</id>
+            <url>http://maven-repository.jdddata.com/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>jddsjReleases</id>
+            <url>http://maven-repository.jdddata.com/nexus/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
     <properties>
         <dubbo.version>2.6.2</dubbo.version>
         <springboot.version>2.0.4.RELEASE</springboot.version>
@@ -73,6 +90,13 @@
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-client -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-tools</artifactId>
             <version>4.3.0</version>
         </dependency>
 

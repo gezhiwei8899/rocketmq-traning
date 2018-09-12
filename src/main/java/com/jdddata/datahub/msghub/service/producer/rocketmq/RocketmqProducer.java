@@ -1,10 +1,10 @@
-package com.jdddata.datahub.msghub.producer.rocketmq;
+package com.jdddata.datahub.msghub.service.producer.rocketmq;
 
 import com.alibaba.fastjson.JSON;
 import com.jdddata.datahub.msghub.common.RocketMQException;
 import com.jdddata.datahub.msghub.common.TopicMgr;
 import com.jdddata.datahub.msghub.config.MQInfo;
-import com.jdddata.datahub.msghub.producer.ISender;
+import com.jdddata.datahub.msghub.service.api.IProducer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -21,7 +21,7 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
  * @Date: 2018/9/7 18:07
  * @modified By:
  */
-public class RocketmqSender implements ISender {
+public class RocketmqProducer implements IProducer {
 
     private DefaultMQProducer mqProducer;
 
@@ -66,13 +66,16 @@ public class RocketmqSender implements ISender {
     }
 
     @Override
-    public boolean send(String namespace, String schema, com.jdddata.datahub.common.service.Message message) {
+    public boolean send(String namespace, String schema, com.jdddata.datahub.common.service.message.Message message) {
         try {
+            //TODO bytes复用
             byte[] msgBtyes = JSON.toJSONBytes(message);
 
-            Message msg = new Message(TopicMgr.parseTopic(namespace, schema), message.getTable(), "POS" + message.getBinlogPosition(), msgBtyes);
+            String topic = TopicMgr.parseTopic(namespace, schema, message.getTable());
 
-            SendResult sendResult = mqProducer.send(msg, new SelectMessageQueueByHash(), message.getTable());
+            Message msg = new Message(topic, message.getTable(), "POS" + message.getBinlogPosition(), msgBtyes);
+
+            SendResult sendResult = mqProducer.send(msg);
             if (sendResult == null || !SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
                 return false;
             }

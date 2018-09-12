@@ -1,15 +1,16 @@
-package com.jdddata.datahub.msghub.message;
+package com.jdddata.datahub.msghub.service.api;
 
-import com.jdddata.datahub.common.service.Message;
+
+import com.jdddata.datahub.common.service.message.Message;
 
 /**
- * @InterfaceName: IReceive
+ * @InterfaceName: ProducerDataHandler
  * @Author: 葛志伟(赛事)
  * @Description:
  * @Date: 2018/9/10 9:51
  * @modified By:
  */
-public interface IReceive {
+public interface ProducerDataHandler {
 
     boolean store(Message message);
 

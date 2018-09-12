@@ -8,7 +8,14 @@ package com.jdddata.datahub.msghub.common;
  * @modified By:
  */
 public class TopicMgr {
-    public static String parseTopic(String namespace, String schema) {
-        return namespace + "_" + schema;
+    public static String parseTopic(String namespace, String schema, String table) {
+        return namespace + "_" + schema + "_" + table;
+    }
+
+    public static String parseMesageCacheKey(String s, String s1, String s2) {
+        if (null==s) {
+            s = "rocketmq";
+        }
+        return s + "_" + s1 + "_" + s2;
     }
 }
