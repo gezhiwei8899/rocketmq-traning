@@ -1,7 +1,10 @@
 package com.jdddata.datahub.msghub.service.consumer;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.jdddata.datahub.common.service.consumer.PullResult;
 import com.jdddata.datahub.msghub.common.TopicMgr;
+import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.ConsumerServiceApi;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,9 @@ public class ConsumerBase implements ConsumerServiceApi {
 
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
+    static {
+        Metrics.defaultRegistry().register(MetricRegistry.name(ConsumerBase.class, "ConsumerBase IConsumer", "size"), (Gauge<Long>) () -> (long) STRING_ROCKET_CONSUMER_TASK_MAP.size());
+    }
 
     @Override
     public boolean start(String s, String s1, String s2, long l, int i) {

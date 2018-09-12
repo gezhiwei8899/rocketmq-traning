@@ -20,10 +20,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Service
 public class ProducerDataHandlerImpl implements ProducerDataHandler {
 
+    /**
+     * 数据生产端消息堆积队列
+     */
     private static final BlockingQueue<Message> MESSAGE_BLOCKING_QUEUE = new LinkedBlockingQueue<>(100000);
 
     static {
-        Metrics.defaultRegistry().register(MetricRegistry.name(ProducerDataHandlerImpl.class, "name", "size"), (Gauge<Long>) () -> (long) MESSAGE_BLOCKING_QUEUE.size());
+        Metrics.defaultRegistry().register(MetricRegistry.name(ProducerDataHandlerImpl.class, "producer MESSAGE_BLOCKING_QUEUE", "size"), (Gauge<Long>) () -> (long) MESSAGE_BLOCKING_QUEUE.size());
     }
 
     @Override

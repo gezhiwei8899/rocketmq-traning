@@ -1,20 +1,21 @@
 package com.jdddata.datahub.msghub.service.consumer.rocketmq;
 
 import com.alibaba.fastjson.JSON;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.jdddata.datahub.common.service.message.Message;
 import com.jdddata.datahub.msghub.common.TopicMgr;
+import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
 import com.jdddata.datahub.msghub.service.consumer.cache.MessageCache;
+import com.jdddata.datahub.msghub.service.producer.ProducerDataHandlerImpl;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,6 +36,7 @@ public class RocketMqConsumer implements IConsumer {
 
     private static final Map<String, MessageQueue> STRING_MESSAGE_QUEUE_MAP = new ConcurrentHashMap<>();
 
+
     private boolean running;
 
     private DefaultMQPullConsumer consumer;
@@ -50,6 +52,24 @@ public class RocketMqConsumer implements IConsumer {
         this.consumer = new DefaultMQPullConsumer(s1);
         this.topic = s2;
         this.key = TopicMgr.parseMesageCacheKey("rokcetmq", s1, s2);
+        initMetrics();
+
+    }
+
+    private void initMetrics() {
+
+        SortedMap<String, Gauge> gauges = Metrics.defaultRegistry().getGauges();
+        String topsize = MetricRegistry.name(RocketMqConsumer.class, "STRING_MESSAGE_QUEUE_MAP", "size");
+        if (!gauges.containsKey(topsize)) {
+            Metrics.defaultRegistry().register(topsize, (Gauge<Long>) () -> (long) STRING_MESSAGE_QUEUE_MAP.size());
+        }
+
+        for (Map.Entry<String, BlockingQueue<MessageCache>> stringBlockingQueueEntry : STRING_BLOCKING_QUEUE_MAP.entrySet()) {
+            String cacheSize = MetricRegistry.name(RocketMqConsumer.class, "STRING_BLOCKING_QUEUE_MAP", stringBlockingQueueEntry.getKey(), "size");
+            if (!gauges.containsKey(cacheSize)) {
+                Metrics.defaultRegistry().register(cacheSize, (Gauge<Long>) () -> (long) stringBlockingQueueEntry.getValue().size());
+            }
+        }
     }
 
 
@@ -188,4 +208,5 @@ public class RocketMqConsumer implements IConsumer {
             e.printStackTrace();
         }
     }
+
 }

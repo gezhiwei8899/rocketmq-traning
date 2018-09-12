@@ -6,8 +6,8 @@ import com.codahale.metrics.Meter;
 import com.jdddata.datahub.common.service.message.Message;
 import com.jdddata.datahub.common.service.producer.ProducerDataService;
 import com.jdddata.datahub.common.service.producer.Result;
-import com.jdddata.datahub.msghub.service.api.ProducerDataHandler;
 import com.jdddata.datahub.msghub.metric.Metrics;
+import com.jdddata.datahub.msghub.service.api.ProducerDataHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -28,11 +28,15 @@ public class ProducerDataServiceImpl implements ProducerDataService {
     @Override
     public Result produce(String namespace, String schema, Message message) {
         requests.mark();
-
+        Result result = new Result();
         if (producerDataHandler.store(message)) {
+
+            result.setCode(0);
+            result.setMessage("");
+            return result;
         }
-
-
-        return null;
+        result.setMessage("error");
+        result.setCode(1);
+        return result;
     }
 }
