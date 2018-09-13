@@ -1,8 +1,8 @@
 package com.jdddata.datahub.msghub.service.api;
 
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.config.MQInfo;
+import com.jdddata.datahub.msghub.config.RocketMqContext;
 
 import java.io.Closeable;
 
@@ -15,8 +15,8 @@ import java.io.Closeable;
  */
 public interface IProducer extends Closeable {
 
-    void start(MQInfo msgHubConfig) throws RocketMQException;
+    void start(RocketMqContext msgHubConfig) throws RocketMQException;
 
-    boolean send(String namespace, String schema, Message message);
+    boolean send(String namespace, String schema, HubMessage message);
 
 }

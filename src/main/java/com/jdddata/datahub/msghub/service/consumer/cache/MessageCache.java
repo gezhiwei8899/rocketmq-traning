@@ -1,7 +1,9 @@
 package com.jdddata.datahub.msghub.service.consumer.cache;
 
 
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.consumer.HubMessageExt;
+import com.jdddata.datahub.common.service.message.HubMessage;
+import org.apache.rocketmq.common.message.MessageExt;
 
 /**
  * @ClassName: MessageCache
@@ -12,57 +14,51 @@ import com.jdddata.datahub.common.service.message.Message;
  */
 public final class MessageCache {
 
-    private String topic;
-    private long nextBeginOffset;
-    private Message message;
-    private long minOffset;
-    private long maxOffset;
+    private final String topic;
+    private final long nextBeginOffset;
+    private final long minOffset;
+    private final long maxOffset;
+    private HubMessageExt hubMessageExt;
 
-    public MessageCache(String topic, long maxOffset, long minOffset, long l, Message message) {
+    public MessageCache(String topic, long maxOffset, long minOffset, long nextBeginOffset, HubMessage hubMessage, MessageExt messageExt) {
         this.topic = topic;
-        this.nextBeginOffset = l;
-        this.message = message;
-        this.minOffset = minOffset;
         this.maxOffset = maxOffset;
-    }
-
-    public long getMinOffset() {
-        return minOffset;
-    }
-
-    public void setMinOffset(long minOffset) {
         this.minOffset = minOffset;
+        this.nextBeginOffset = nextBeginOffset;
+        this.hubMessageExt = convert(messageExt, hubMessage);
+
     }
 
-    public long getMaxOffset() {
-        return maxOffset;
+    private HubMessageExt convert(MessageExt messageExt, HubMessage hubMessage) {
+        HubMessageExt hubMessageExt = new HubMessageExt();
+        hubMessageExt.setHubMessage(hubMessage);
+        hubMessageExt.setQueueId(messageExt.getQueueId());
+        hubMessageExt.setQueueOffset(messageExt.getQueueOffset());
+        return hubMessageExt;
     }
 
-    public void setMaxOffset(long maxOffset) {
-        this.maxOffset = maxOffset;
-    }
 
     public String getTopic() {
         return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
     }
 
     public long getNextBeginOffset() {
         return nextBeginOffset;
     }
 
-    public void setNextBeginOffset(long nextBeginOffset) {
-        this.nextBeginOffset = nextBeginOffset;
+    public long getMinOffset() {
+        return minOffset;
     }
 
-    public Message getMessage() {
-        return message;
+    public long getMaxOffset() {
+        return maxOffset;
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
+    public HubMessageExt getHubMessageExt() {
+        return hubMessageExt;
+    }
+
+    public void setHubMessageExt(HubMessageExt hubMessageExt) {
+        this.hubMessageExt = hubMessageExt;
     }
 }

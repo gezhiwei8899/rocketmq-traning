@@ -1,8 +1,8 @@
 package com.jdddata.datahub.msghub.service.api;
 
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.config.MsgHubConfig;
+import com.jdddata.datahub.msghub.config.RocketMqContext;
 
 /**
  * @InterfaceName: ProducerServiceApi
@@ -12,13 +12,13 @@ import com.jdddata.datahub.msghub.config.MsgHubConfig;
  * @modified By:
  */
 public interface ProducerServiceApi {
-    boolean send(String namespace, String schema, Message message);
+    boolean send(String namespace, String schema, HubMessage message);
 
     boolean isStartable();
 
     void close();
 
-    void init(MsgHubConfig msgHubConfig) throws RocketMQException;
-
     void setStartable(boolean b);
+
+    void startProducerMsgHub(RocketMqContext rocketMqContext) throws RocketMQException;
 }

@@ -7,6 +7,7 @@ CONF_PATH="$BIN_PATH/../conf"
 LIBS_PATH="$BIN_PATH/../libs"
 MAIN_CLASS="com.jdddata.datahub.msghub.DatahubServer"
 
+
 # print usage
 function print_usage(){
     echo "Usage: bootstrap.sh [-f] COMMAND"

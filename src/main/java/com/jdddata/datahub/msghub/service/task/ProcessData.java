@@ -1,6 +1,6 @@
 package com.jdddata.datahub.msghub.service.task;
 
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.service.api.ProducerDataHandler;
 import com.jdddata.datahub.msghub.service.api.ProducerServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class ProcessData implements CommandLineRunner {
         Thread t = new Thread(() -> {
             try {
                 while (running) {
-                    Message message = producerDataHandler.take();
+                    HubMessage message = producerDataHandler.take();
                     if (null != message) {
                         boolean send = producerServiceApi.send(message.getNamespace(), message.getSchema(), message);
                         if (!send) {
@@ -44,7 +44,7 @@ public class ProcessData implements CommandLineRunner {
             } finally {
                 producerServiceApi.close();
             }
-        });
+        },"ProducerDataHandler-take-thread");
         t.start();
 
     }

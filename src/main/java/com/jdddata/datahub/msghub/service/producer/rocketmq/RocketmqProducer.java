@@ -1,9 +1,10 @@
 package com.jdddata.datahub.msghub.service.producer.rocketmq;
 
 import com.alibaba.fastjson.JSON;
+import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
 import com.jdddata.datahub.msghub.common.TopicMgr;
-import com.jdddata.datahub.msghub.config.MQInfo;
+import com.jdddata.datahub.msghub.config.RocketMqContext;
 import com.jdddata.datahub.msghub.service.api.IProducer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.exception.MQBrokerException;
@@ -29,24 +30,21 @@ public class RocketmqProducer implements IProducer {
 
 
     @Override
-    public void start(MQInfo msgHubConfig) throws RocketMQException {
-        if (StringUtils.isBlank(msgHubConfig.getGroupName())) {
+    public void start(RocketMqContext msgHubConfig) throws RocketMQException {
+        if (StringUtils.isBlank(msgHubConfig.getProducerGroupname())) {
             throw new RocketMQException("groupName is blank");
         }
-        if (StringUtils.isBlank(msgHubConfig.getNamesrvAddr())) {
+        if (StringUtils.isBlank(msgHubConfig.getNamesvr())) {
             throw new RocketMQException("nameServerAddr is blank");
         }
-        if (StringUtils.isBlank(msgHubConfig.getInstanceName())) {
-            throw new RocketMQException("instanceName is blank");
-        }
-        mqProducer = new DefaultMQProducer(msgHubConfig.getGroupName());
-        mqProducer.setNamesrvAddr(msgHubConfig.getNamesrvAddr());
-        mqProducer.setInstanceName(msgHubConfig.getInstanceName());
-        mqProducer.setMaxMessageSize(msgHubConfig.getMaxMessageSize());
-        mqProducer.setSendMsgTimeout(msgHubConfig.getSendMsgTimeout());
+
+        mqProducer = new DefaultMQProducer(msgHubConfig.getProducerGroupname());
+        mqProducer.setNamesrvAddr(msgHubConfig.getNamesvr());
+        //TODO 了解参数
+//        mqProducer.setMaxMessageSize(msgHubConfig.getMaxMessageSize());
+//        mqProducer.setSendMsgTimeout(msgHubConfig.getSendMsgTimeout());
         try {
             mqProducer.start();
-            System.out.println("producer启动成功");
         } catch (MQClientException e) {
             throw new RocketMQException("producer启动失败", e);
         }
@@ -66,7 +64,7 @@ public class RocketmqProducer implements IProducer {
     }
 
     @Override
-    public boolean send(String namespace, String schema, com.jdddata.datahub.common.service.message.Message message) {
+    public boolean send(String namespace, String schema, HubMessage message) {
         try {
             //TODO bytes复用
             byte[] msgBtyes = JSON.toJSONBytes(message);

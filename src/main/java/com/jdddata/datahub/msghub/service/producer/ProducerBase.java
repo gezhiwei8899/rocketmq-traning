@@ -1,17 +1,13 @@
 package com.jdddata.datahub.msghub.service.producer;
 
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.config.MQInfo;
-import com.jdddata.datahub.msghub.config.MsgHubConfig;
+import com.jdddata.datahub.msghub.config.RocketMqContext;
 import com.jdddata.datahub.msghub.service.api.IProducer;
 import com.jdddata.datahub.msghub.service.api.ProducerServiceApi;
-import com.jdddata.datahub.msghub.service.producer.rocketmq.RocketmqProducer;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,11 +25,6 @@ public class ProducerBase implements ProducerServiceApi {
 
     private volatile boolean startable = false;
 
-
-    private MsgHubConfig msgHubConfig;
-
-    private List<MQInfo> mqInfos;
-
     @Override
     public void close() {
         SENDER_MAP.values().forEach(sender -> {
@@ -45,40 +36,9 @@ public class ProducerBase implements ProducerServiceApi {
         });
     }
 
-    @Override
-    public void init(MsgHubConfig msgHubConfig) throws RocketMQException {
-        this.msgHubConfig = msgHubConfig;
-        this.mqInfos = msgHubConfig.getMqInfoList();
-        register();
-    }
-
-
-    private void register() throws RocketMQException {
-        List<MQInfo> mqInfoList = msgHubConfig.getMqInfoList();
-        for (MQInfo mqInfo : mqInfoList) {
-            IProducer iSender = createSend(mqInfo);
-
-            SENDER_MAP.put(mqInfo.getMqName(), iSender);
-        }
-    }
-
-
-    private static IProducer createSend(MQInfo mqInfo) throws RocketMQException {
-        IProducer iSender = null;
-        String mqName = mqInfo.getMqName();
-        if (StringUtils.equalsIgnoreCase(mqName, "kafka")) {
-
-        }
-        if (StringUtils.equalsIgnoreCase(mqName, "rocektmq")) {
-            iSender = new RocketmqProducer();
-        }
-        iSender = new RocketmqProducer();
-        iSender.start(mqInfo);
-        return iSender;
-    }
 
     @Override
-    public boolean send(String namespace, String schema, Message message) {
+    public boolean send(String namespace, String schema, HubMessage message) {
         boolean isSend = true;
         for (IProducer sender : SENDER_MAP.values()) {
             isSend = sender.send(namespace, schema, message);
@@ -94,5 +54,13 @@ public class ProducerBase implements ProducerServiceApi {
     @Override
     public void setStartable(boolean startable) {
         this.startable = startable;
+    }
+
+    @Override
+    public void startProducerMsgHub(RocketMqContext rocketMqContext) throws RocketMQException {
+        IProducer iSender = ProducerFactory.createSend("rocketmq");
+        iSender.start(rocketMqContext);
+        SENDER_MAP.put("rocketmq", iSender);
+        setStartable(true);
     }
 }

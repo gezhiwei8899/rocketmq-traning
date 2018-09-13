@@ -1,6 +1,7 @@
 package com.jdddata.datahub.msghub.service.api;
 
-import com.jdddata.datahub.common.service.consumer.PullResult;
+import com.jdddata.datahub.common.service.consumer.HubPullResult;
+import org.apache.rocketmq.client.exception.MQClientException;
 
 /**
  * @ClassName: IConsumer
@@ -15,9 +16,13 @@ public interface IConsumer extends Runnable {
 
     void setRunninged(boolean b);
 
-    PullResult pullMessage() throws InterruptedException;
+    HubPullResult pullMessage() throws InterruptedException;
 
-    PullResult pullMessage(Long offset, Integer max);
+    HubPullResult pullMessage(Long offset, Integer max);
 
     boolean updateOffset(String s, String s1, String s2, String s3);
+
+    void start() throws MQClientException;
+
+    void clear();
 }

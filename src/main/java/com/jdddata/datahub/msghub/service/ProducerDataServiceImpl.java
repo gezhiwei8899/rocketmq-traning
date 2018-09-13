@@ -3,7 +3,7 @@ package com.jdddata.datahub.msghub.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.codahale.metrics.Meter;
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.common.service.producer.ProducerDataService;
 import com.jdddata.datahub.common.service.producer.Result;
 import com.jdddata.datahub.msghub.metric.Metrics;
@@ -26,7 +26,7 @@ public class ProducerDataServiceImpl implements ProducerDataService {
     private ProducerDataHandler producerDataHandler;
 
     @Override
-    public Result produce(String namespace, String schema, Message message) {
+    public Result produce(String namespace, String schema, HubMessage message) {
         requests.mark();
         Result result = new Result();
         if (producerDataHandler.store(message)) {

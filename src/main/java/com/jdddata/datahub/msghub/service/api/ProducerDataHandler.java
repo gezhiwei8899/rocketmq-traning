@@ -1,7 +1,7 @@
 package com.jdddata.datahub.msghub.service.api;
 
 
-import com.jdddata.datahub.common.service.message.Message;
+import com.jdddata.datahub.common.service.message.HubMessage;
 
 /**
  * @InterfaceName: ProducerDataHandler
@@ -12,8 +12,8 @@ import com.jdddata.datahub.common.service.message.Message;
  */
 public interface ProducerDataHandler {
 
-    boolean store(Message message);
+    boolean store(HubMessage message);
 
-    Message take() throws InterruptedException;
+    HubMessage take() throws InterruptedException;
 
 }
