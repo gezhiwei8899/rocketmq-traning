@@ -1,6 +1,7 @@
 package com.jdddata.datahub.msghub.service.api;
 
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
+import org.apache.rocketmq.client.exception.MQClientException;
 
 import java.util.List;
 
@@ -12,9 +13,11 @@ import java.util.List;
  * @modified By:
  */
 public interface ConsumerDataHandler {
-    HubPullResult consumer(String s, String s1, String s2, Long l, Integer i);
 
-    boolean updateOffset(String s, String s1, String s2, String s3);
 
-    boolean start(String s, String s1, List<String> list);
+    boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException;
+
+    HubPullResult consumer(String type, String groupName, String uuid, String topic, Long offset, Integer max);
+
+    boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset);
 }

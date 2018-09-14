@@ -3,9 +3,9 @@ package com.jdddata.datahub.msghub.service.producer.rocketmq;
 import com.alibaba.fastjson.JSON;
 import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.common.TopicMgr;
 import com.jdddata.datahub.msghub.config.RocketMqContext;
 import com.jdddata.datahub.msghub.service.api.IProducer;
+import com.jdddata.datahub.msghub.service.consumer.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -69,7 +69,7 @@ public class RocketmqProducer implements IProducer {
             //TODO bytes复用
             byte[] msgBtyes = JSON.toJSONBytes(message);
 
-            String topic = TopicMgr.parseTopic(namespace, schema, message.getTable());
+            String topic = Utils.generateConsumerKey(namespace, schema, message.getTable());
 
             Message msg = new Message(topic, message.getTable(), "POS" + message.getBinlogPosition(), msgBtyes);
 

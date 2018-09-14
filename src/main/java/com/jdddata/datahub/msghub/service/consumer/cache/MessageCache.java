@@ -34,6 +34,7 @@ public final class MessageCache {
         hubMessageExt.setHubMessage(hubMessage);
         hubMessageExt.setQueueId(messageExt.getQueueId());
         hubMessageExt.setQueueOffset(messageExt.getQueueOffset());
+        hubMessageExt.setTopic(topic);
         return hubMessageExt;
     }
 

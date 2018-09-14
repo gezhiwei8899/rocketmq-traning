@@ -7,6 +7,7 @@ import com.jdddata.datahub.common.service.consumer.HubClientInfo;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -22,23 +23,28 @@ import java.util.List;
 public class ConsumerDataServiceImpl implements ConsumerDataService {
 
     private final Meter requests = Metrics.defaultRegistry().meter("ConsumerDataServiceImpl");
+
     @Autowired
     private ConsumerDataHandler consumerDataHandler;
 
+
     @Override
-    public HubPullResult subscribe(String s, String s1, String s2, Long l, Integer i) {
+    public HubPullResult subscribe(String type, String groupName, String uuid, String topic, Long offset, Integer max) {
         requests.mark();
-        return consumerDataHandler.consumer(s, s1, s2, l, i);
+        return consumerDataHandler.consumer(type, groupName, uuid, topic, offset, max);
     }
 
     @Override
-    public boolean commit(String s, String s1, String s2, String s3) {
-        return consumerDataHandler.updateOffset(s, s1, s2, s3);
+    public boolean commit(String type, String groupName, String uuid, String topic, Long offset) {
+        return consumerDataHandler.updateOffset(type, groupName, uuid, topic, offset);
     }
 
     @Override
-    public boolean register(String s, String s1, List<String> list, HubClientInfo hubClientInfo) {
-        return consumerDataHandler.start(s, s1, list);
+    public boolean register(String type, String groupName, String uuid, List<String> topics, HubClientInfo hubClientInfo) {
+        try {
+            return consumerDataHandler.register(uuid, type, groupName, topics);
+        } catch (MQClientException e) {
+            return false;
+        }
     }
-
 }

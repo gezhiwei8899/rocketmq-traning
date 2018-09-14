@@ -30,7 +30,6 @@ public class ProducerDataServiceImpl implements ProducerDataService {
         requests.mark();
         Result result = new Result();
         if (producerDataHandler.store(message)) {
-
             result.setCode(0);
             result.setMessage("");
             return result;

@@ -20,7 +20,7 @@ public interface IConsumer extends Runnable {
 
     HubPullResult pullMessage(Long offset, Integer max);
 
-    boolean updateOffset(String s, String s1, String s2, String s3);
+    boolean updateOffset(String type, String groupName, String topic, Long offset);
 
     void start() throws MQClientException;
 

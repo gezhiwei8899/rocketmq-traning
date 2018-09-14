@@ -3,6 +3,9 @@ package com.jdddata.datahub.msghub.service.consumer;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
 import com.jdddata.datahub.msghub.service.api.ConsumerServiceApi;
+import com.jdddata.datahub.msghub.service.consumer.connection.Connection;
+import com.jdddata.datahub.msghub.service.consumer.connection.ConnectionCache;
+import com.jdddata.datahub.msghub.service.consumer.unit.ConsumerCache;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,22 +34,34 @@ public class ConsumerDataHandlerImpl implements ConsumerDataHandler {
     @Autowired
     private ConsumerServiceApi consumerServiceApi;
 
-    @Override
-    public HubPullResult consumer(String s, String s1, String s2, Long l, Integer i) {
-        return consumerServiceApi.pullConsumer(s, s1, s2, l, i);
-    }
 
     @Override
-    public boolean updateOffset(String s, String s1, String s2, String s3) {
-        return consumerServiceApi.updateOffset(s, s1, s2, s3);
-    }
-
-    @Override
-    public boolean start(String s, String s1, List<String> list) {
-        try {
-            return consumerServiceApi.start(s, s1, list);
-        } catch (MQClientException e) {
-            return false;
+    public boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException {
+        Connection connection = ConnectionCache.getConnection(uuid);
+        //null==connection 表示第一次连接，查找是否有缓存的consumers被这个连接所需要，
+        if (null == connection) {
+            List<String> consumerKeys = Utils.generateConsumerKeys(type, groupName, topics);
+            List<String> keys = ConsumerCache.backNotInit(consumerKeys);
+            if (consumerServiceApi.register(type, groupName, keys, uuid)) {
+                ConnectionCache.putConnectionCache(uuid, consumerKeys);
+            }
+        } else {
+            //TODO
         }
+
+        return true;
     }
+
+    @Override
+    public HubPullResult consumer(String type, String groupName, String uuid, String topic, Long offset, Integer max) {
+        ConnectionCache.refreshIdleTime(uuid);
+        return consumerServiceApi.pullConsumer(type, groupName, topic, offset, max);
+    }
+
+    @Override
+    public boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) {
+        ConnectionCache.refreshIdleTime(uuid);
+        return consumerServiceApi.updateOffset(type, groupName, topic, offset);
+    }
+
 }

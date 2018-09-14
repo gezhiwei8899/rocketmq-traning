@@ -13,11 +13,10 @@ import java.util.List;
  * @modified By:
  */
 public interface ConsumerServiceApi {
-    boolean start(String s, String s1, String s2, Long l, Integer i) throws MQClientException;
 
-    HubPullResult pullConsumer(String s, String s1, String s2, Long l, Integer i);
+    HubPullResult pullConsumer(String type, String groupName, String topic, Long offset, Integer max);
 
-    boolean updateOffset(String s, String s1, String s2, String s3);
+    boolean updateOffset(String type, String groupName, String topic, Long offset);
 
-    boolean start(String s, String s1, List<String> list) throws MQClientException;
+    boolean register(String type, String groupName, List<String> keys, String uuid) throws MQClientException;
 }

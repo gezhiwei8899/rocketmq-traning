@@ -6,10 +6,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.jdddata.datahub.common.service.consumer.HubMessageExt;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.common.service.message.HubMessage;
-import com.jdddata.datahub.msghub.common.TopicMgr;
 import com.jdddata.datahub.msghub.config.RocketMqContext;
 import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
+import com.jdddata.datahub.msghub.service.consumer.Utils;
 import com.jdddata.datahub.msghub.service.consumer.cache.MessageCache;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
@@ -58,7 +58,7 @@ public class RocketMqConsumer implements IConsumer {
         this.groupName = s1;
         this.consumer = new DefaultMQPullConsumer(s1);
         this.topic = s2;
-        this.key = TopicMgr.parseMesageCacheKey("rokcetmq", s1, s2);
+        this.key = Utils.generateConsumerKey("rokcetmq", s1, s2);
         this.rocketMqContext = rocketMqContext;
         initMetrics();
 
@@ -134,10 +134,9 @@ public class RocketMqConsumer implements IConsumer {
     }
 
     @Override
-    public boolean updateOffset(String s, String s1, String s2, String s3) {
-        String remotekey = TopicMgr.parseMesageCacheKey(s, s1, s2);
-        long l = Long.parseLong(s3);
-        return updateOffset(remotekey, l);
+    public boolean updateOffset(String type, String groupName, String topic, Long offset) {
+        String remotekey = Utils.generateConsumerKey(type, groupName, topic);
+        return updateOffset(remotekey, offset);
     }
 
     private boolean updateOffset(String keys, Long offset) {
