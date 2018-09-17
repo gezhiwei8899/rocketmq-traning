@@ -8,6 +8,8 @@ import com.jdddata.datahub.msghub.service.api.IConsumer;
 import com.jdddata.datahub.msghub.service.consumer.unit.ConsumerCache;
 import com.jdddata.datahub.msghub.service.consumer.unit.ConsumerUnit;
 import org.apache.rocketmq.client.exception.MQClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import java.util.concurrent.Executors;
 @Service
 public class ConsumerBase implements ConsumerServiceApi {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(ConsumerBase.class);
 
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10, r -> new Thread(r, "pullMessageFromMQ"));
 
@@ -52,6 +55,7 @@ public class ConsumerBase implements ConsumerServiceApi {
         ConsumerUnit consumerUnit = ConsumerCache.getConsumerUnit(key);
         IConsumer iConsumer = consumerUnit.getiConsumer();
         if (null == iConsumer) {
+            LOGGER.error("type:{} groupName:{} topic:{} get null consumer");
             return false;
         }
         return iConsumer.updateOffset(type, groupName, topic, offset);

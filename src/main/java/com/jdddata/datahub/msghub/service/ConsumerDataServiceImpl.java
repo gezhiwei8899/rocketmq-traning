@@ -2,11 +2,11 @@ package com.jdddata.datahub.msghub.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.codahale.metrics.Meter;
-import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
 import com.jdddata.datahub.common.service.consumer.ConsumerDataService;
 import com.jdddata.datahub.common.service.consumer.HubClientInfo;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.common.service.consumer.HubPullStats;
+import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
 import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -41,7 +41,7 @@ public class ConsumerDataServiceImpl implements ConsumerDataService {
         try {
             return consumerDataHandler.consumer(type, groupName, uuid, topic, offset, max);
         } catch (MsgHubConnectionExcepiton msgHubConnectionExcepiton) {
-                return new HubPullResult(HubPullStats.NO_CONNECTION, topic, 0, 0, 0, null);
+            return new HubPullResult(HubPullStats.NO_CONNECTION, topic, 0, 0, 0, null);
         }
     }
 
@@ -51,6 +51,7 @@ public class ConsumerDataServiceImpl implements ConsumerDataService {
         try {
             return consumerDataHandler.updateOffset(type, groupName, uuid, topic, offset);
         } catch (MsgHubConnectionExcepiton msgHubConnectionExcepiton) {
+            LOGGER.error("client commit error {} {} {} {}", type, groupName, topic);
             return false;
         }
     }

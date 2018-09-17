@@ -59,7 +59,7 @@ public class RocketMqConsumer implements IConsumer {
         this.groupName = s1;
         this.consumer = new DefaultMQPullConsumer(s1);
         this.topic = s2;
-        this.key = Utils.generateConsumerKey("rokcetmq", s1, s2);
+        this.key = Utils.generateConsumerKey("rocketmq", s1, s2);
         this.rocketMqContext = rocketMqContext;
         initMetrics();
 
@@ -148,7 +148,7 @@ public class RocketMqConsumer implements IConsumer {
         } catch (Exception e) {
             return false;
         }
-        return false;
+        return true;
     }
 
     @Override
