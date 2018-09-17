@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class DubboConfiguration {
-    @Value("")
+    @Value("messagehub.zookeeper")
     private String zk;
 
     @Bean
