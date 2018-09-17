@@ -1,5 +1,6 @@
 package com.jdddata.datahub.msghub.service.consumer;
 
+import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
 import com.jdddata.datahub.msghub.service.api.ConsumerServiceApi;
@@ -38,7 +39,7 @@ public class ConsumerDataHandlerImpl implements ConsumerDataHandler {
     @Override
     public boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException {
         Connection connection = ConnectionCache.getConnection(uuid);
-        //null==connection 表示第一次连接，查找是否有缓存的consumers被这个连接所需要，
+        //null==connection 表示第一次连接，查找是否有缓存的consumers被这个连接所需要，选择需要创建的topic在创建
         if (null == connection) {
             List<String> consumerKeys = Utils.generateConsumerKeys(type, groupName, topics);
             List<String> keys = ConsumerCache.backNotInit(consumerKeys);
@@ -53,13 +54,13 @@ public class ConsumerDataHandlerImpl implements ConsumerDataHandler {
     }
 
     @Override
-    public HubPullResult consumer(String type, String groupName, String uuid, String topic, Long offset, Integer max) {
+    public HubPullResult consumer(String type, String groupName, String uuid, String topic, Long offset, Integer max) throws MsgHubConnectionExcepiton {
         ConnectionCache.refreshIdleTime(uuid);
         return consumerServiceApi.pullConsumer(type, groupName, topic, offset, max);
     }
 
     @Override
-    public boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) {
+    public boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) throws MsgHubConnectionExcepiton {
         ConnectionCache.refreshIdleTime(uuid);
         return consumerServiceApi.updateOffset(type, groupName, topic, offset);
     }

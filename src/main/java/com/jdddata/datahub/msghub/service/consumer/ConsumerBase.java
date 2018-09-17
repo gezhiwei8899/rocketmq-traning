@@ -1,6 +1,7 @@
 package com.jdddata.datahub.msghub.service.consumer;
 
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
+import com.jdddata.datahub.common.service.consumer.HubPullStats;
 import com.jdddata.datahub.msghub.config.RocketMqContext;
 import com.jdddata.datahub.msghub.service.api.ConsumerServiceApi;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
@@ -39,6 +40,9 @@ public class ConsumerBase implements ConsumerServiceApi {
         String key = Utils.generateConsumerKey(type, groupName, topic);
         ConsumerUnit consumerUnit = ConsumerCache.getConsumerUnit(key);
         IConsumer iConsumer = consumerUnit.getiConsumer();
+        if (null == iConsumer) {
+            return new HubPullResult(HubPullStats.NO_MESSAGE, topic, 0, 0, 0, null);
+        }
         return iConsumer.pullMessage(offset, max);
     }
 
@@ -69,7 +73,6 @@ public class ConsumerBase implements ConsumerServiceApi {
             executorService.submit(iConsumer);
             iConsumer.setRunninged(true);
             ConsumerCache.putConsumerToCache(key, iConsumer, uuid);
-
         }
         return true;
     }

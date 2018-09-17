@@ -12,7 +12,7 @@ import com.jdddata.datahub.msghub.config.RocketMqContext;
  * @modified By:
  */
 public interface ProducerServiceApi {
-    boolean send(String namespace, String schema, HubMessage message);
+    boolean send(HubMessage message);
 
     boolean isStartable();
 

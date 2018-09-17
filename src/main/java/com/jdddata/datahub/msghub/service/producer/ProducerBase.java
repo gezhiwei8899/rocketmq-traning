@@ -31,17 +31,17 @@ public class ProducerBase implements ProducerServiceApi {
             try {
                 sender.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                //ignore
             }
         });
     }
 
 
     @Override
-    public boolean send(String namespace, String schema, HubMessage message) {
+    public boolean send(HubMessage message) {
         boolean isSend = true;
         for (IProducer sender : SENDER_MAP.values()) {
-            isSend = sender.send(namespace, schema, message);
+            isSend = sender.send(message.getNamespace(), message.getSchema(), message.getTable(), message);
         }
         return isSend;
     }

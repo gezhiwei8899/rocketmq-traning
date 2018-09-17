@@ -5,6 +5,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.jdddata.datahub.common.service.consumer.HubMessageExt;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
+import com.jdddata.datahub.common.service.consumer.HubPullStats;
 import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.config.RocketMqContext;
 import com.jdddata.datahub.msghub.metric.Metrics;
@@ -99,12 +100,10 @@ public class RocketMqConsumer implements IConsumer {
 
     @Override
     public HubPullResult pullMessage(Long offset, Integer max) {
-
-
         //TODO 暂时不考虑offset
         BlockingQueue<MessageCache> messageCaches = STRING_BLOCKING_QUEUE_MAP.get(key);
         if (null == messageCaches) {
-            return null;
+            return new HubPullResult(HubPullStats.NO_MESSAGE, topic, 0, 0, 0, null);
         }
 
         int num = null != max ? max : 32;
@@ -114,7 +113,7 @@ public class RocketMqConsumer implements IConsumer {
 
         int i = messageCaches.drainTo(messageCacheList, num);
         if (i < 0) {
-            return null;
+            return new HubPullResult(HubPullStats.NO_MESSAGE, topic, 0, 0, 0, null);
         }
 
         long maxOffset = 0;
@@ -130,7 +129,7 @@ public class RocketMqConsumer implements IConsumer {
             }
             messageExts.add(messageCacheList.get(j).getHubMessageExt());
         }
-        return new HubPullResult(topic, nextoffset, minoffset, maxOffset, messageExts);
+        return new HubPullResult(HubPullStats.OK, topic, nextoffset, minoffset, maxOffset, messageExts);
     }
 
     @Override
@@ -150,7 +149,6 @@ public class RocketMqConsumer implements IConsumer {
             return false;
         }
         return false;
-
     }
 
     @Override

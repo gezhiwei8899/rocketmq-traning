@@ -23,7 +23,7 @@ public class ProducerDataHandlerImpl implements ProducerDataHandler {
     /**
      * 数据生产端消息堆积队列
      */
-    private static final BlockingQueue<HubMessage> MESSAGE_BLOCKING_QUEUE = new LinkedBlockingQueue<>(100000);
+    private static final BlockingQueue<HubMessage> MESSAGE_BLOCKING_QUEUE = new LinkedBlockingQueue<>(10000);
 
     static {
         Metrics.defaultRegistry().register(MetricRegistry.name(ProducerDataHandlerImpl.class, "producer MESSAGE_BLOCKING_QUEUE", "size"), (Gauge<Long>) () -> (long) MESSAGE_BLOCKING_QUEUE.size());

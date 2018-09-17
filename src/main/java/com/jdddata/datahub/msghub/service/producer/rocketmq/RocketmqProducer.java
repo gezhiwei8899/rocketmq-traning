@@ -64,12 +64,12 @@ public class RocketmqProducer implements IProducer {
     }
 
     @Override
-    public boolean send(String namespace, String schema, HubMessage message) {
+    public boolean send(String namespace, String schema, String table, HubMessage message) {
         try {
             //TODO bytes复用
             byte[] msgBtyes = JSON.toJSONBytes(message);
 
-            String topic = Utils.generateConsumerKey(namespace, schema, message.getTable());
+            String topic = Utils.generateConsumerKey(namespace, schema, table);
 
             Message msg = new Message(topic, message.getTable(), "POS" + message.getBinlogPosition(), msgBtyes);
 

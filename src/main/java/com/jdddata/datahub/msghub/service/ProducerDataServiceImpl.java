@@ -26,10 +26,10 @@ public class ProducerDataServiceImpl implements ProducerDataService {
     private ProducerDataHandler producerDataHandler;
 
     @Override
-    public Result produce(String namespace, String schema, HubMessage message) {
+    public Result produce(String namespace, String schema, String table, HubMessage hubMessage) {
         requests.mark();
         Result result = new Result();
-        if (producerDataHandler.store(message)) {
+        if (producerDataHandler.store(hubMessage)) {
             result.setCode(0);
             result.setMessage("");
             return result;

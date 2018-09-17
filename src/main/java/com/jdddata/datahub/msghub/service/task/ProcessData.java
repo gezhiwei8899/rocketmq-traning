@@ -3,6 +3,8 @@ package com.jdddata.datahub.msghub.service.task;
 import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.service.api.ProducerDataHandler;
 import com.jdddata.datahub.msghub.service.api.ProducerServiceApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ProcessData implements CommandLineRunner {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(ProcessData.class);
 
     private volatile boolean running = true;
 
@@ -33,19 +37,20 @@ public class ProcessData implements CommandLineRunner {
                 while (running) {
                     HubMessage message = producerDataHandler.take();
                     if (null != message) {
-                        boolean send = producerServiceApi.send(message.getNamespace(), message.getSchema(), message);
+                        boolean send = producerServiceApi.send(message);
                         if (!send) {
-
+                            LOGGER.error("send message to namespace:{} schema:{} table:{} occured error and this time offset {}", message.getNamespace(), message.getSchema(), message.getTable(), message.getBinlogPosition());
+                            //TODO 此处告警或者通知同步器停止工作
                         }
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("ProcessData error:{}", e);
             } finally {
                 producerServiceApi.close();
             }
-        },"ProducerDataHandler-take-thread");
+        }, "ProcessData-#run");
         t.start();
-
+        LOGGER.info("ProcessData started");
     }
 }

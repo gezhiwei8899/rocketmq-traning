@@ -17,6 +17,6 @@ public interface IProducer extends Closeable {
 
     void start(RocketMqContext msgHubConfig) throws RocketMQException;
 
-    boolean send(String namespace, String schema, HubMessage message);
+    boolean send(String namespace, String schema, String table, HubMessage message);
 
 }

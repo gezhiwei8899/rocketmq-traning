@@ -1,5 +1,7 @@
 package com.jdddata.datahub.msghub.service.consumer.connection;
 
+import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ public class ConnectionCache {
     //key: uuid
     private static final Map<String, Connection> CONNECTION_MAP = new ConcurrentHashMap<>();
 
+    //key: connection.ref == uuid
     private static final Map<String, List<String>> Ref_CONSUMERS_MAP = new ConcurrentHashMap<>();
 
 
@@ -32,11 +35,15 @@ public class ConnectionCache {
         CONNECTION_MAP.put(uuid, new Connection(uuid, s, new Date()));
     }
 
-    public static void refreshIdleTime(String uuid) {
+    public static void refreshIdleTime(String uuid) throws MsgHubConnectionExcepiton {
         Connection connection = CONNECTION_MAP.get(uuid);
         if (null == connection) {
-            //throw
+            throw new MsgHubConnectionExcepiton(uuid + " connection is not exsit");
         }
         connection.refresh();
+    }
+
+    public static Map<String, Connection> listAll() {
+        return CONNECTION_MAP;
     }
 }
