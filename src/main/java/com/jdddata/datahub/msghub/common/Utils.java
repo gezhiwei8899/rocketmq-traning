@@ -1,4 +1,4 @@
-package com.jdddata.datahub.msghub.service.consumer;
+package com.jdddata.datahub.msghub.common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class Utils {
 
     public static String generateConsumerKey(String s, String s1, String s2) {
         if (null == s) {
-            s = "rocketmq";
+            s = MsghubConstants.ROCKET_MQ;
         }
         return s + "_" + s1 + "_" + s2;
     }

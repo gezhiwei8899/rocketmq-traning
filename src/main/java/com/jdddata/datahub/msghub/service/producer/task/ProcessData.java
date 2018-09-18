@@ -1,4 +1,4 @@
-package com.jdddata.datahub.msghub.service.task;
+package com.jdddata.datahub.msghub.service.producer.task;
 
 import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.service.api.ProducerDataHandler;

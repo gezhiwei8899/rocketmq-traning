@@ -1,4 +1,4 @@
-package com.jdddata.datahub.msghub.service.consumer.connection;
+package com.jdddata.datahub.msghub.service.consumer.cache.connection;
 
 import java.util.Date;
 

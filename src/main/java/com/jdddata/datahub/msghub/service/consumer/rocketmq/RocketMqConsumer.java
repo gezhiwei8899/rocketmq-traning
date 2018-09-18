@@ -7,10 +7,11 @@ import com.jdddata.datahub.common.service.consumer.HubMessageExt;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.common.service.consumer.HubPullStats;
 import com.jdddata.datahub.common.service.message.HubMessage;
-import com.jdddata.datahub.msghub.config.RocketMqContext;
+import com.jdddata.datahub.msghub.common.MsghubConstants;
+import com.jdddata.datahub.msghub.common.Utils;
+import com.jdddata.datahub.msghub.config.MsgHubContext;
 import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
-import com.jdddata.datahub.msghub.service.consumer.Utils;
 import com.jdddata.datahub.msghub.service.consumer.cache.MessageCache;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
@@ -53,14 +54,14 @@ public class RocketMqConsumer implements IConsumer {
 
     private String key;
 
-    private RocketMqContext rocketMqContext;
+    private MsgHubContext msgHubContext;
 
-    public RocketMqConsumer(String s1, String s2, RocketMqContext rocketMqContext) {
-        this.groupName = s1;
-        this.consumer = new DefaultMQPullConsumer(s1);
-        this.topic = s2;
-        this.key = Utils.generateConsumerKey("rocketmq", s1, s2);
-        this.rocketMqContext = rocketMqContext;
+    public RocketMqConsumer(String groupName, String topic, MsgHubContext msgHubContext) {
+        this.groupName = groupName;
+        this.consumer = new DefaultMQPullConsumer(groupName);
+        this.topic = topic;
+        this.key = Utils.generateConsumerKey(MsghubConstants.ROCKET_MQ, groupName, topic);
+        this.msgHubContext = msgHubContext;
         initMetrics();
 
     }
@@ -106,7 +107,7 @@ public class RocketMqConsumer implements IConsumer {
             return new HubPullResult(HubPullStats.NO_MESSAGE, topic, 0, 0, 0, null);
         }
 
-        int num = null != max ? max : 32;
+        int num = (null != max && max < 32) ? max : 32;
 
         List<MessageCache> messageCacheList = new ArrayList<>(num);
         List<HubMessageExt> messageExts = new ArrayList<>(num);
@@ -153,7 +154,7 @@ public class RocketMqConsumer implements IConsumer {
 
     @Override
     public void start() throws MQClientException {
-        consumer.setNamesrvAddr(rocketMqContext.getNamesvr());
+        consumer.setNamesrvAddr(msgHubContext.getNamesvr());
         consumer.start();
     }
 

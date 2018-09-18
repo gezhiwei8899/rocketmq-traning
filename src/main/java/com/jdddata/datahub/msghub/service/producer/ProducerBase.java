@@ -1,10 +1,12 @@
 package com.jdddata.datahub.msghub.service.producer;
 
 import com.jdddata.datahub.common.service.message.HubMessage;
+import com.jdddata.datahub.msghub.common.MsghubConstants;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.config.RocketMqContext;
+import com.jdddata.datahub.msghub.config.MsgHubContext;
 import com.jdddata.datahub.msghub.service.api.IProducer;
 import com.jdddata.datahub.msghub.service.api.ProducerServiceApi;
+import com.jdddata.datahub.msghub.service.producer.rocketmq.RocketmqProducer;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -57,10 +59,16 @@ public class ProducerBase implements ProducerServiceApi {
     }
 
     @Override
-    public void startProducerMsgHub(RocketMqContext rocketMqContext) throws RocketMQException {
-        IProducer iSender = ProducerFactory.createSend("rocketmq");
-        iSender.start(rocketMqContext);
-        SENDER_MAP.put("rocketmq", iSender);
+    public void initProducer(MsgHubContext msgHubContext) throws RocketMQException {
+
+        if (null != msgHubContext.getNamesvr()) {
+            IProducer iSender = new RocketmqProducer(msgHubContext.getNamesvr(), msgHubContext.getRocketGroupName());
+            iSender.start();
+            SENDER_MAP.put(MsghubConstants.ROCKET_MQ, iSender);
+        }
+        if (null != msgHubContext.getKafkaBroker()) {
+            //TODO
+        }
         setStartable(true);
     }
 }

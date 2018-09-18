@@ -6,6 +6,7 @@ import com.jdddata.datahub.common.service.consumer.ConsumerDataService;
 import com.jdddata.datahub.common.service.consumer.HubClientInfo;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.common.service.consumer.HubPullStats;
+import com.jdddata.datahub.msghub.common.ConsumerRegisterException;
 import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
 import com.jdddata.datahub.msghub.metric.Metrics;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
@@ -60,7 +61,7 @@ public class ConsumerDataServiceImpl implements ConsumerDataService {
     public boolean register(String type, String groupName, String uuid, List<String> topics, HubClientInfo hubClientInfo) {
         try {
             return consumerDataHandler.register(uuid, type, groupName, topics);
-        } catch (MQClientException e) {
+        } catch (MQClientException | ConsumerRegisterException e) {
             LOGGER.error("client register error {} {} {} {}", type, groupName, topics);
             return false;
         }

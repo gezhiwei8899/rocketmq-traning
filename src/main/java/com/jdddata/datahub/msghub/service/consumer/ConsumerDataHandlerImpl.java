@@ -1,12 +1,14 @@
 package com.jdddata.datahub.msghub.service.consumer;
 
+import com.jdddata.datahub.msghub.common.ConsumerRegisterException;
 import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
+import com.jdddata.datahub.msghub.common.Utils;
 import com.jdddata.datahub.msghub.service.api.ConsumerDataHandler;
 import com.jdddata.datahub.msghub.service.api.ConsumerServiceApi;
-import com.jdddata.datahub.msghub.service.consumer.connection.Connection;
-import com.jdddata.datahub.msghub.service.consumer.connection.ConnectionCache;
-import com.jdddata.datahub.msghub.service.consumer.unit.ConsumerCache;
+import com.jdddata.datahub.msghub.service.consumer.cache.connection.Connection;
+import com.jdddata.datahub.msghub.service.consumer.cache.connection.ConnectionCache;
+import com.jdddata.datahub.msghub.service.consumer.cache.consumerunit.ConsumerCache;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,7 @@ public class ConsumerDataHandlerImpl implements ConsumerDataHandler {
 
 
     @Override
-    public boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException {
+    public boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException, ConsumerRegisterException {
         Connection connection = ConnectionCache.getConnection(uuid);
         //null==connection 表示第一次连接，查找是否有缓存的consumers被这个连接所需要，选择需要创建的topic在创建
         if (null == connection) {

@@ -3,10 +3,8 @@ package com.jdddata.datahub.msghub.service.producer.rocketmq;
 import com.alibaba.fastjson.JSON;
 import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.config.RocketMqContext;
+import com.jdddata.datahub.msghub.common.Utils;
 import com.jdddata.datahub.msghub.service.api.IProducer;
-import com.jdddata.datahub.msghub.service.consumer.Utils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -26,20 +24,21 @@ public class RocketmqProducer implements IProducer {
 
     private DefaultMQProducer mqProducer;
 
-    private boolean send;
+    private String namesvr;
+
+    private String rocketGroupName;
+
+    public RocketmqProducer(String namesvr, String rocketGroupName) {
+        this.namesvr = namesvr;
+        this.rocketGroupName = rocketGroupName;
+    }
 
 
     @Override
-    public void start(RocketMqContext msgHubConfig) throws RocketMQException {
-        if (StringUtils.isBlank(msgHubConfig.getProducerGroupname())) {
-            throw new RocketMQException("groupName is blank");
-        }
-        if (StringUtils.isBlank(msgHubConfig.getNamesvr())) {
-            throw new RocketMQException("nameServerAddr is blank");
-        }
+    public void start() throws RocketMQException {
 
-        mqProducer = new DefaultMQProducer(msgHubConfig.getProducerGroupname());
-        mqProducer.setNamesrvAddr(msgHubConfig.getNamesvr());
+        mqProducer.setNamesrvAddr(namesvr);
+        mqProducer.setProducerGroup(rocketGroupName);
         //TODO 了解参数
 //        mqProducer.setMaxMessageSize(msgHubConfig.getMaxMessageSize());
 //        mqProducer.setSendMsgTimeout(msgHubConfig.getSendMsgTimeout());

@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 public class MsgHubConfiguration {
 
     @Bean(name = "rocketmqContext")
-    @ConfigurationProperties(prefix = "messagehub.rocketmq")
-    public RocketMqContext getRocketmqContext() {
-        return new RocketMqContext();
+    @ConfigurationProperties(prefix = "messagehub.mq")
+    public MsgHubContext getRocketmqContext() {
+        return new MsgHubContext();
     }
 }

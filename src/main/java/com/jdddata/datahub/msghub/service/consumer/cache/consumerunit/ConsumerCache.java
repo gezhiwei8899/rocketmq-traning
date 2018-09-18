@@ -1,4 +1,4 @@
-package com.jdddata.datahub.msghub.service.consumer.unit;
+package com.jdddata.datahub.msghub.service.consumer.cache.consumerunit;
 
 import com.jdddata.datahub.msghub.service.api.IConsumer;
 import org.apache.commons.lang3.StringUtils;

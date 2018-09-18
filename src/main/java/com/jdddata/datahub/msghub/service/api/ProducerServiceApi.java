@@ -2,7 +2,7 @@ package com.jdddata.datahub.msghub.service.api;
 
 import com.jdddata.datahub.common.service.message.HubMessage;
 import com.jdddata.datahub.msghub.common.RocketMQException;
-import com.jdddata.datahub.msghub.config.RocketMqContext;
+import com.jdddata.datahub.msghub.config.MsgHubContext;
 
 /**
  * @InterfaceName: ProducerServiceApi
@@ -20,5 +20,5 @@ public interface ProducerServiceApi {
 
     void setStartable(boolean b);
 
-    void startProducerMsgHub(RocketMqContext rocketMqContext) throws RocketMQException;
+    void initProducer(MsgHubContext msgHubContext) throws RocketMQException;
 }

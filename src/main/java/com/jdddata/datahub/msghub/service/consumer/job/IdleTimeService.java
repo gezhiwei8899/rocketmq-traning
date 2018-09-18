@@ -1,7 +1,7 @@
 //package com.jdddata.datahub.msghub.service.consumer.job;
 //
-//import com.jdddata.datahub.msghub.service.consumer.connection.Connection;
-//import com.jdddata.datahub.msghub.service.consumer.connection.ConnectionCache;
+//import com.jdddata.datahub.msghub.service.consumer.cache.connection.Connection;
+//import com.jdddata.datahub.msghub.service.consumer.cache.connection.ConnectionCache;
 //import org.springframework.scheduling.annotation.Scheduled;
 //import org.springframework.stereotype.Component;
 //

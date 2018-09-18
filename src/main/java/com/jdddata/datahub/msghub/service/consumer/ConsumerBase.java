@@ -2,11 +2,14 @@ package com.jdddata.datahub.msghub.service.consumer;
 
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
 import com.jdddata.datahub.common.service.consumer.HubPullStats;
-import com.jdddata.datahub.msghub.config.RocketMqContext;
+import com.jdddata.datahub.msghub.common.ConsumerRegisterException;
+import com.jdddata.datahub.msghub.common.Utils;
+import com.jdddata.datahub.msghub.config.MsgHubContext;
 import com.jdddata.datahub.msghub.service.api.ConsumerServiceApi;
 import com.jdddata.datahub.msghub.service.api.IConsumer;
-import com.jdddata.datahub.msghub.service.consumer.unit.ConsumerCache;
-import com.jdddata.datahub.msghub.service.consumer.unit.ConsumerUnit;
+import com.jdddata.datahub.msghub.service.consumer.factory.ConsumerFactory;
+import com.jdddata.datahub.msghub.service.consumer.cache.consumerunit.ConsumerCache;
+import com.jdddata.datahub.msghub.service.consumer.cache.consumerunit.ConsumerUnit;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +35,7 @@ public class ConsumerBase implements ConsumerServiceApi {
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10, r -> new Thread(r, "pullMessageFromMQ"));
 
     @Autowired
-    private RocketMqContext rocketMqContext;
+    private MsgHubContext msgHubContext;
 
     static {
     }
@@ -63,7 +66,7 @@ public class ConsumerBase implements ConsumerServiceApi {
 
 
     @Override
-    public boolean register(String type, String groupName, List<String> keys, String uuid) throws MQClientException {
+    public boolean register(String type, String groupName, List<String> keys, String uuid) throws MQClientException, ConsumerRegisterException {
         for (String key : keys) {
             String topic = key.replace(type + "_" + groupName + "_", "");
 
@@ -71,7 +74,7 @@ public class ConsumerBase implements ConsumerServiceApi {
             if (null != consumerUnit) {
                 continue;
             }
-            IConsumer iConsumer = ConsumerFactory.createInstance(type, groupName, topic, rocketMqContext);
+            IConsumer iConsumer = ConsumerFactory.createInstance(type, groupName, topic, msgHubContext);
             iConsumer.start();
             //TODO 阻塞队列，考虑循环Connection队列执行
             executorService.submit(iConsumer);
