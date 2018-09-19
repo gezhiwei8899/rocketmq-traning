@@ -31,6 +31,7 @@ public class RocketmqProducer implements IProducer {
     public RocketmqProducer(String namesvr, String rocketGroupName) {
         this.namesvr = namesvr;
         this.rocketGroupName = rocketGroupName;
+        mqProducer = new DefaultMQProducer(rocketGroupName);
     }
 
 

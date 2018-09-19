@@ -15,9 +15,9 @@ import java.util.List;
  */
 public interface ConsumerServiceApi {
 
-    HubPullResult pullConsumer(String type, String groupName, String topic, Long offset, Integer max);
-
     boolean updateOffset(String type, String groupName, String topic, Long offset);
 
-    boolean register(String type, String groupName, List<String> keys, String uuid) throws MQClientException, ConsumerRegisterException;
+    void register(String type, String groupName, List<String> topics) throws ConsumerRegisterException, MQClientException;
+
+    HubPullResult pullConsumer(String type, String groupName, String uuid, String topic, Long offset, Integer max);
 }

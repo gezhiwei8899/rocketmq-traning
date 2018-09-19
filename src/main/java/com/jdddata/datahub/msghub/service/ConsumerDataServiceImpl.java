@@ -42,7 +42,7 @@ public class ConsumerDataServiceImpl implements ConsumerDataService {
         try {
             return consumerDataHandler.consumer(type, groupName, uuid, topic, offset, max);
         } catch (MsgHubConnectionExcepiton msgHubConnectionExcepiton) {
-            return new HubPullResult(HubPullStats.NO_CONNECTION, topic, 0, 0, 0, null);
+            return new HubPullResult(HubPullStats.NO_CONNECTION, null);
         }
     }
 

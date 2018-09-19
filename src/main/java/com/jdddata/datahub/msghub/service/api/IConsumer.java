@@ -11,18 +11,7 @@ import org.apache.rocketmq.client.exception.MQClientException;
  * @modified By:
  */
 public interface IConsumer extends Runnable {
-
-    boolean isRunninged();
-
-    void setRunninged(boolean b);
-
-    HubPullResult pullMessage() throws InterruptedException;
-
-    HubPullResult pullMessage(Long offset, Integer max);
-
-    boolean updateOffset(String type, String groupName, String topic, Long offset);
-
     void start() throws MQClientException;
 
-    void clear();
+    HubPullResult pullMessage(Long offset, Integer max);
 }
