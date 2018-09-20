@@ -1,6 +1,5 @@
 package com.jdddata.datahub.msghub.service.consumer.rocketmq;
 
-import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.fastjson.JSON;
 import com.jdddata.datahub.common.service.consumer.HubMessageExt;
 import com.jdddata.datahub.common.service.consumer.HubPullResult;
@@ -15,6 +14,8 @@ import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +34,15 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class RocketMqConsumer implements IConsumer {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(RocketMqConsumer.class);
 
     //缓存 一个key 一个缓存队列。最多存储一万条
     private static final Map<String, BlockingQueue<MessageCache>> STRING_BLOCKING_QUEUE_MAP = new ConcurrentHashMap<>();
 
     private static final Map<MessageQueue, Long> OFFSET_TABLE = new ConcurrentHashMap<>();
 
-    //key和messagetQue的关系，当需要清除的时候需要从OFFSET_TABLE清除
-    private static final Map<String, Set<MessageQueue>> SET_MAP = new ConcurrentHashMap<>();
+    //topic和messagetQue的关系，当需要清除的时候需要从OFFSET_TABLE清除
+    private static final Map<String, MessageQueue> SET_MAP = new ConcurrentHashMap<>();
 
     private static final int SIZE_LIMIT = 10000;
 
@@ -72,10 +74,11 @@ public class RocketMqConsumer implements IConsumer {
     }
 
     @Override
-    public HubPullResult pullMessage(Long offset, Integer max) {
+    public HubPullResult pullMessage(Long offset, Integer max, String topic) {
         //TODO 暂时不考虑offset
-        BlockingQueue<MessageCache> messageCaches = STRING_BLOCKING_QUEUE_MAP.get(key);
+        BlockingQueue<MessageCache> messageCaches = STRING_BLOCKING_QUEUE_MAP.get(generateCacheKey(key, topic));
         if (null == messageCaches) {
+            LOGGER.debug("topic:{} has no messageChache", topic);
             return new HubPullResult(HubPullStats.NO_MESSAGE, null);
         }
         int num = (null != max && max < 32) ? max : 32;
@@ -85,6 +88,7 @@ public class RocketMqConsumer implements IConsumer {
 
         int i = messageCaches.drainTo(messageCacheList, num);
         if (i < 0) {
+            LOGGER.debug("topic:{} draint is null", topic);
             return new HubPullResult(HubPullStats.NO_MESSAGE, null);
         }
         for (int j = 0; j < messageCacheList.size(); j++) {
@@ -93,21 +97,31 @@ public class RocketMqConsumer implements IConsumer {
         return new HubPullResult(HubPullStats.OK, messageExts);
     }
 
+    @Override
+    public boolean commitOffset(String topic, Long offset) throws MQClientException {
+        MessageQueue messageQueue = SET_MAP.get(generateCacheKey(key, topic));
+        if (null == messageQueue) {
+            return false;
+        }
+        consumer.updateConsumeOffset(messageQueue, offset);
+        return true;
+    }
+
 
     @Override
     public void run() {
-        BlockingQueue<MessageCache> messageCaches = STRING_BLOCKING_QUEUE_MAP.get(key);
-        if (null != messageCaches && messageCaches.size() > SIZE_LIMIT) {
-            return;
-        }
         try {
             for (String topic : topics) {
+                BlockingQueue<MessageCache> messageCaches = STRING_BLOCKING_QUEUE_MAP.get(generateCacheKey(key, topic));
+                if (null != messageCaches && messageCaches.size() > SIZE_LIMIT) {
+                    break;
+                }
                 Set<MessageQueue> mqs = consumer.fetchSubscribeMessageQueues(topic);
                 for (MessageQueue mq : mqs) {
                     try {
                         PullResult pullResult = consumer.pullBlockIfNotFound(mq, null, getMessageQueueOffset(mq), 32);
                         putMessageQueueOffset(mq, pullResult.getNextBeginOffset());
-                        putKeyMessageQueues(key, mq);
+                        putKeyMessageQueues(generateCacheKey(key, topic), mq);
                         switch (pullResult.getPullStatus()) {
                             case FOUND:
                                 process(topic, pullResult);
@@ -126,33 +140,41 @@ public class RocketMqConsumer implements IConsumer {
                     }
                 }
             }
+
         } catch (MQClientException e) {
             //TODO 通知
         }
     }
 
-    private void putKeyMessageQueues(String key, MessageQueue mq) {
-        Set<MessageQueue> messageQueues = SET_MAP.get(key);
-        if (null == messageQueues) {
-            messageQueues = new ConcurrentHashSet<>();
-        }
-        messageQueues.add(mq);
-        SET_MAP.put(key, messageQueues);
+    private String generateCacheKey(String key, String topic) {
+        return key + "_" + topic;
     }
 
+
+    private void putKeyMessageQueues(String key, MessageQueue mq) {
+        SET_MAP.put(key, mq);
+    }
+
+    /**
+     * 处理数据，
+     * 把获取到的数据缓存到 STRING_BLOCKING_QUEUE_MAP
+     *
+     * @param topic
+     * @param pullResult
+     */
     private void process(String topic, PullResult pullResult) {
 
         long maxOffset = pullResult.getMaxOffset();
         long minOffset = pullResult.getMinOffset();
         long nextBeginOffset = pullResult.getNextBeginOffset();
 
-        BlockingQueue<MessageCache> messageCaches = fetchMessageCacheQueue(key);
+        BlockingQueue<MessageCache> messageCaches = fetchMessageCacheQueue(generateCacheKey(key, topic));
 
         for (MessageExt messageExt : pullResult.getMsgFoundList()) {
             HubMessage hubMessage = JSON.parseObject(messageExt.getBody(), HubMessage.class);
             messageCaches.offer(new MessageCache(topic, maxOffset, minOffset, nextBeginOffset, hubMessage, messageExt));
         }
-        STRING_BLOCKING_QUEUE_MAP.put(key, messageCaches);
+        STRING_BLOCKING_QUEUE_MAP.put(generateCacheKey(key, topic), messageCaches);
     }
 
     private BlockingQueue<MessageCache> fetchMessageCacheQueue(String key) {
@@ -163,6 +185,12 @@ public class RocketMqConsumer implements IConsumer {
         return messageCaches;
     }
 
+    /**
+     * 通过Message获取nextOffset
+     *
+     * @param mq
+     * @return
+     */
     private static long getMessageQueueOffset(MessageQueue mq) {
         Long offset = OFFSET_TABLE.get(mq);
         if (offset != null) {
@@ -171,6 +199,12 @@ public class RocketMqConsumer implements IConsumer {
         return 0;
     }
 
+    /**
+     * 把nextoffset缓存起来
+     *
+     * @param mq
+     * @param offset
+     */
     private static void putMessageQueueOffset(MessageQueue mq, long offset) {
         OFFSET_TABLE.put(mq, offset);
     }

@@ -1,9 +1,12 @@
 package com.gezhiwei.msghub;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.junit.Test;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -32,5 +35,14 @@ public class RocketMqTest {
                 System.out.println("asdfasdf");
             }
         }
+    }
+
+    @Test
+    public void tee() {
+        System.out.println(new Date());
+        Date date = new Date();
+        Date date1 = DateUtils.addMinutes(date, 5);
+        int i = DateUtils.truncatedCompareTo(date1, date1, Calendar.MINUTE);
+        System.out.println(i);
     }
 }

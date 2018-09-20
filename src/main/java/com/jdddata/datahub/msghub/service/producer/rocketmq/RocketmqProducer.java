@@ -69,7 +69,7 @@ public class RocketmqProducer implements IProducer {
             //TODO bytes复用
             byte[] msgBtyes = JSON.toJSONBytes(message);
 
-            String topic = Utils.generateConsumerKey(namespace, schema, table);
+            String topic = Utils.producerKey(namespace, schema, table);
 
             Message msg = new Message(topic, message.getTable(), "POS" + message.getBinlogPosition(), msgBtyes);
 
@@ -88,5 +88,10 @@ public class RocketmqProducer implements IProducer {
         if (null != mqProducer) {
             mqProducer.shutdown();
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

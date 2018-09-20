@@ -17,9 +17,10 @@ import java.util.List;
 public interface ConsumerDataHandler {
 
 
-    boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException, ConsumerRegisterException;
+    boolean register(String uuid, String type, String groupName, String instanceId, List<String> topics) throws MQClientException, ConsumerRegisterException;
 
-    HubPullResult consumer(String type, String groupName, String uuid, String topic, Long offset, Integer max) throws MsgHubConnectionExcepiton;
 
-    boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) throws MsgHubConnectionExcepiton;
+    boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) throws MsgHubConnectionExcepiton, MQClientException;
+
+    HubPullResult consumer(String type, String groupName, String instanceId, String uuid, String topic, Long offset, Integer max) throws MsgHubConnectionExcepiton;
 }

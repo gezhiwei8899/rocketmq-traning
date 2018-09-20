@@ -42,6 +42,7 @@ public class ProcessData implements CommandLineRunner {
                             LOGGER.error("send message to namespace:{} schema:{} table:{} occured error and this time offset {}", message.getNamespace(), message.getSchema(), message.getTable(), message.getBinlogPosition());
                             //TODO 此处告警或者通知同步器停止工作
                         }
+                        LOGGER.debug("send message to namespace:{} schema:{} table:{} and this time offset {}", message.getNamespace(), message.getSchema(), message.getTable(), message.getBinlogPosition());
                     }
                 }
             } catch (InterruptedException e) {

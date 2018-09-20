@@ -30,30 +30,31 @@ public class ConsumerDataHandlerImpl implements ConsumerDataHandler {
     private ConsumerServiceApi consumerServiceApi;
 
     @Override
-    public boolean register(String uuid, String type, String groupName, List<String> topics) throws MQClientException, ConsumerRegisterException {
+    public synchronized boolean register(String uuid, String type, String groupName, String instanceId, List<String> topics) throws MQClientException, ConsumerRegisterException {
         Connection connection = ConnectionCache.getConnection(uuid);
         if (null == connection) {
+            connection = new Connection(uuid, type, groupName, instanceId, topics);
             String key = Utils.consumerKey(type, groupName);
+            //如果消费者有缓存存在，那么不用注册IConsumer，直接添加绑定关系
             if (ConsumerCache.exsit(key)) {
-                throw new ConsumerRegisterException("相同的groupName已经注册过");
+                ConsumerCache.cacheConsumerNewConnection(key, connection);
+            } else {
+                consumerServiceApi.register(type, groupName, topics, connection);
             }
-            consumerServiceApi.register(type, groupName, topics);
-            ConnectionCache.cacheConnection(uuid, type, groupName, topics);
-        } else {
-            //TODO
+            ConnectionCache.cacheConnection(uuid, type, groupName, instanceId, topics);
         }
-        return false;
+        return true;
     }
 
     @Override
-    public HubPullResult consumer(String type, String groupName, String uuid, String topic, Long offset, Integer max) throws MsgHubConnectionExcepiton {
+    public boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) throws MsgHubConnectionExcepiton, MQClientException {
+        ConnectionCache.refreshIdleTime(uuid);
+        return consumerServiceApi.updateOffset(type, groupName, topic, offset);
+    }
+
+    @Override
+    public HubPullResult consumer(String type, String groupName, String instanceId, String uuid, String topic, Long offset, Integer max) throws MsgHubConnectionExcepiton {
         ConnectionCache.refreshIdleTime(uuid);
         return consumerServiceApi.pullConsumer(type, groupName, uuid, topic, offset, max);
-    }
-
-    @Override
-    public boolean updateOffset(String type, String groupName, String uuid, String topic, Long offset) throws MsgHubConnectionExcepiton {
-        ConnectionCache.refreshIdleTime(uuid);
-        return false;
     }
 }

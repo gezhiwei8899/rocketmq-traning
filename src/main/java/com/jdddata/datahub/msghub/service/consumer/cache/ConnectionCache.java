@@ -20,9 +20,6 @@ public class ConnectionCache {
         return CONNECTION_MAP.get(uuid);
     }
 
-    public static void cacheConnection(String uuid, String type, String groupName, List<String> topics) {
-        CONNECTION_MAP.put(uuid, new Connection(uuid, type, groupName, topics));
-    }
 
     public static void refreshIdleTime(String uuid) throws MsgHubConnectionExcepiton {
         Connection connection = CONNECTION_MAP.get(uuid);
@@ -30,5 +27,9 @@ public class ConnectionCache {
             throw new MsgHubConnectionExcepiton(uuid + " connection is not exsit");
         }
         connection.refresh();
+    }
+
+    public static void cacheConnection(String uuid, String type, String groupName, String instanceId, List<String> topics) {
+        CONNECTION_MAP.put(uuid, new Connection(uuid, type, groupName, instanceId, topics));
     }
 }

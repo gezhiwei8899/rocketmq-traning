@@ -13,5 +13,7 @@ import org.apache.rocketmq.client.exception.MQClientException;
 public interface IConsumer extends Runnable {
     void start() throws MQClientException;
 
-    HubPullResult pullMessage(Long offset, Integer max);
+    HubPullResult pullMessage(Long offset, Integer max, String topic);
+
+    boolean commitOffset(String topic, Long offset) throws MQClientException;
 }

@@ -35,34 +35,33 @@ public class ConsumerDataServiceImpl implements ConsumerDataService {
     @Autowired
     private ConsumerDataHandler consumerDataHandler;
 
-
     @Override
-    public HubPullResult subscribe(String type, String groupName, String uuid, String topic, Long offset, Integer max) {
+    public HubPullResult subscribe(String type, String groupName, String instanceId, String uuid, String topic, Long offset, Integer max) {
         requestS.mark();
         try {
-            return consumerDataHandler.consumer(type, groupName, uuid, topic, offset, max);
+            return consumerDataHandler.consumer(type, groupName, instanceId, uuid, topic, offset, max);
         } catch (MsgHubConnectionExcepiton msgHubConnectionExcepiton) {
             return new HubPullResult(HubPullStats.NO_CONNECTION, null);
         }
     }
 
     @Override
-    public boolean commit(String type, String groupName, String uuid, String topic, Long offset) {
+    public boolean commit(String type, String groupName, String instanceId, String uuid, String topic, Long offset) {
         requestC.mark();
         try {
             return consumerDataHandler.updateOffset(type, groupName, uuid, topic, offset);
-        } catch (MsgHubConnectionExcepiton msgHubConnectionExcepiton) {
+        } catch (MsgHubConnectionExcepiton | MQClientException msgHubConnectionExcepiton) {
             LOGGER.error("client commit error {} {} {} {}", type, groupName, topic);
             return false;
         }
     }
 
     @Override
-    public boolean register(String type, String groupName, String uuid, List<String> topics, HubClientInfo hubClientInfo) {
+    public boolean register(String type, String groupName, String instanceId, String uuid, List<String> topics, HubClientInfo hubClientInfo) {
         try {
-            return consumerDataHandler.register(uuid, type, groupName, topics);
+            return consumerDataHandler.register(uuid, type, groupName, instanceId, topics);
         } catch (MQClientException | ConsumerRegisterException e) {
-            LOGGER.error("client register error {} {} {} {}", type, groupName, topics);
+            LOGGER.error("client register error {} {} {} {},error: {}", type, groupName, topics, e.getMessage());
             return false;
         }
     }

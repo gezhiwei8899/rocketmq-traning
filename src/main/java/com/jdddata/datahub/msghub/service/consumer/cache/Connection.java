@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class Connection {
 
+    private String instanceId;
+
     private String uuid;
 
     private String type;
@@ -22,11 +24,20 @@ public class Connection {
 
     private Date idleTime;
 
-    public Connection(String uuid, String type, String groupName, List<String> topics) {
+    public Connection(String uuid, String type, String groupName, String instanceId, List<String> topics) {
         this.uuid = uuid;
         this.type = type;
         this.groupName = groupName;
+        this.instanceId = instanceId;
         this.topics = topics;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public String getUuid() {
@@ -67,6 +78,10 @@ public class Connection {
 
     public void setIdleTime(Date idleTime) {
         this.idleTime = idleTime;
+    }
+
+    public void add(Connection connection) {
+
     }
 
     public void refresh() {
