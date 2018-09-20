@@ -3,7 +3,7 @@
     <!-- console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger[%L,%F] - %msg%n</Pattern>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %logger[%L,%F] - %msg%n</Pattern>
         </layout>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
@@ -12,11 +12,12 @@
     <!-- file -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <prudent>true</prudent>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>log/%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>log/%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <!-- keep 30 days' worth of history -->
             <maxHistory>7</maxHistory>
+            <maxFileSize>5MB</maxFileSize>
         </rollingPolicy>
         <encoder>
             <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger[%L,%F] - %msg%n</pattern>
@@ -70,5 +71,5 @@
     <logger name="com.mchange" level="ERROR" additivity="false">
         <appender-ref ref="ASYNC_CONSOLE"/>
     </logger>
-    <logger name="com.jdddata.bas.sportdata.mybatis" level="DEBUG"/>
+    <logger name="com.jdddata" level="DEBUG"/>
 </configuration>

@@ -28,7 +28,7 @@ public class IdleTimeService {
         for (Connection connection : ConnectionCache.values()) {
             Date date = DateUtils.addMinutes(connection.getIdleTime(), 15);
             int i = DateUtils.truncatedCompareTo(new Date(), date, Calendar.MINUTE);
-            if (i > 1) {
+            if (i > 0) {
                 try {
                     connection.close();
                 } catch (InterruptedException | IdletimeCloseConsumerException e) {
