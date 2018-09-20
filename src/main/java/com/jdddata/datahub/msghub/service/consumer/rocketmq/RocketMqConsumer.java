@@ -106,8 +106,10 @@ public class RocketMqConsumer implements IConsumer {
 
     @Override
     public void close() throws InterruptedException {
+        KEY_TOPIC.values().forEach(t->t.close());
+        KEY_TOPIC.clear();
         EXECUTOR_SERVICE.shutdown();
-        EXECUTOR_SERVICE.awaitTermination(60,TimeUnit.SECONDS);
+        EXECUTOR_SERVICE.awaitTermination(60, TimeUnit.SECONDS);
         consumer.shutdown();
     }
 

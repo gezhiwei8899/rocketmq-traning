@@ -100,7 +100,7 @@ public class ConsumerParticle implements Runnable {
                 }
             }
         } catch (Exception e) {
-            LOGGER.debug("topic:{} is exception:e", topic, e);
+            LOGGER.error("topic:{} is exception:e", topic, e);
         }
     }
 
@@ -128,5 +128,10 @@ public class ConsumerParticle implements Runnable {
         consumer.updateConsumeOffset(mq, offsets);
         LOGGER.debug("offsets:{} commit success and running offset is {}", offsets, offset);
         return true;
+    }
+
+    public void close() {
+        running = false;
+        blockingQueue.clear();
     }
 }
