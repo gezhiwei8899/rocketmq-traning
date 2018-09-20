@@ -54,4 +54,8 @@ public class ConsumerUnit {
     public void add(Connection connection) {
         this.connections.put(connection, connection.getUuid());
     }
+
+    public void close() throws InterruptedException {
+        iConsumer.close();
+    }
 }

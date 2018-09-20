@@ -20,7 +20,7 @@ public class ConsumerCache {
 
     //Utils.consumerKey(type,groupName)
     private static final Map<String, ConsumerUnit> CONSUMER_MAP = new ConcurrentHashMap<>();
-    private static final BlockingQueue<IConsumer> I_CONSUMERS = new LinkedBlockingQueue<>(10000);
+    private static final BlockingQueue<IConsumer> I_CONSUMERS = new LinkedBlockingQueue<>(10);
 
     public static boolean exsit(String key) {
         return CONSUMER_MAP.containsKey(key);

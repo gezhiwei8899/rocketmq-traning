@@ -1,5 +1,8 @@
 package com.jdddata.datahub.msghub.service.consumer.cache;
 
+import com.jdddata.datahub.msghub.common.IdletimeCloseConsumerException;
+import com.jdddata.datahub.msghub.common.Utils;
+
 import java.util.Date;
 import java.util.List;
 
@@ -86,5 +89,13 @@ public class Connection {
 
     public void refresh() {
         setIdleTime(new Date());
+    }
+
+    public void close() throws InterruptedException, IdletimeCloseConsumerException {
+        ConsumerUnit consumerCache = ConsumerCache.getConsumerCache(Utils.consumerKey(type, groupName));
+        if (null == consumerCache) {
+            throw new IdletimeCloseConsumerException("consumer not exsit");
+        }
+        consumerCache.close();
     }
 }

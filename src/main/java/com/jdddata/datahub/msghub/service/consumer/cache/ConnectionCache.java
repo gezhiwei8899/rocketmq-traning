@@ -2,6 +2,7 @@ package com.jdddata.datahub.msghub.service.consumer.cache;
 
 import com.jdddata.datahub.msghub.common.MsgHubConnectionExcepiton;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,5 +32,9 @@ public class ConnectionCache {
 
     public static void cacheConnection(String uuid, String type, String groupName, String instanceId, List<String> topics) {
         CONNECTION_MAP.put(uuid, new Connection(uuid, type, groupName, instanceId, topics));
+    }
+
+    public static Collection<Connection> values() {
+        return CONNECTION_MAP.values();
     }
 }
